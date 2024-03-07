@@ -14,7 +14,7 @@ object Main extends ZIOAppDefault{
 
   def run =
     (for
-      client <- ZIO.service[Client]
+      client <- ZIO.service[Client].debug
       initialServerState <- Endpoints.getState(client)
 
       stateVar = Var[PageState](initialServerState)
@@ -25,31 +25,38 @@ object Main extends ZIOAppDefault{
 
   def appElement(stateVarLocal: Var[PageState], client: Client): HtmlElement = {
     val topPrioritySignal = stateVarLocal.signal.map(_.priority)
-    
+
+    def zioHelper[E <: Throwable, A](z: ZIO[Scope, E, A]) =
+      Unsafe.unsafe {
+        implicit unsafe =>
+          runtime.unsafe.runToFuture(
+            z.provide(Scope.default)
+          )
+      }
+
+
     val clickObserver = Observer[dom.MouseEvent](
       onNext = {
         ev =>
-          Unsafe.unsafe { 
-            implicit unsafe =>
-              runtime.unsafe.runToFuture(
-                Endpoints.updateState(
-                  client, stateVarLocal.now()
-                ).provide(Scope.default)
-              )
-          }
+          zioHelper(
+            Endpoints.updateState(
+              client, stateVarLocal.now()
+            ).provide(Scope.default)
+          )
           println("Page state: " + stateVarLocal.now())
           dom.console.log(ev.screenX)
       }
     )
-    val element: Div = div(
+    val saveButton = button(
+      cls:="button is-primary",
       onClick --> clickObserver,
-      "Save"
+      "Upload Priority to Server"
     )
 
     val billboard =
       div(
-        h2("Top Priority: ", child.text <-- topPrioritySignal.map(_.getOrElse("None"))),
         input(
+          cls:="input is-primary",
           typ := "text",
           controlled(
             value <-- topPrioritySignal.map(_.getOrElse("")),
@@ -59,9 +66,16 @@ object Main extends ZIOAppDefault{
       )
 
     div(
-      h1("Hello Vite!"),
-      element,
-      billboard,
+      cls := "container",
+      div(
+        cls:= "box",
+        h1(cls:="title", "Top Priority: ", child.text <-- topPrioritySignal.map(_.getOrElse("None"))),
+        div(
+          cls:="section",
+          saveButton
+        ),
+        billboard,
+      )
     )
   }
 

@@ -9,6 +9,9 @@ object Endpoints {
     Endpoint(Method.POST / "pageState")
       .in[PageState]
       .out[String]
+//      .codecErrorEmptyResponse
+//      .codecErrorHandler(CodecError.emptyResponseHandler("Empty response"))
+//      .logCodecError(error => s"Codec error: $error")
 
   val getPageState =
     Endpoint(Method.GET / "pageState")
