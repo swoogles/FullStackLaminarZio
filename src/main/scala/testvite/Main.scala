@@ -69,7 +69,7 @@ object Main extends ZIOAppDefault{
       cls := "container",
       div(
         cls:= "box",
-        h1(cls:="title", "Top Priority: ", child.text <-- topPrioritySignal.map(_.getOrElse("None"))),
+        h1(cls:="title", "Priority: ", child.text <-- topPrioritySignal.map(_.getOrElse("None"))),
         div(
           cls:="section",
           saveButton
