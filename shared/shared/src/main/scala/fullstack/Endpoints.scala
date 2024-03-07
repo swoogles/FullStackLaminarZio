@@ -1,8 +1,7 @@
 package fullstack
 
-import zio.{Scope, ZIO, ZNothing}
-import zio.http.*
-import zio.http.endpoint.{Endpoint, EndpointExecutor, EndpointLocator}
+import zio.http.Method
+import zio.http.endpoint.Endpoint
 
 object Endpoints {
   val post =
@@ -17,47 +16,4 @@ object Endpoints {
     Endpoint(Method.GET / "pageState")
       .out[PageState]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  val locator =
-    EndpointLocator.fromURL(URL.decode("http://localhost:8080").toOption.get)
-
-  def updateState(client: Client, pageState: PageState) = {
-    val executor: EndpointExecutor[Unit] =
-      EndpointExecutor(client, locator, ZIO.unit)
-
-    executor(post(pageState))
-  }
-
-  def getState(client: Client): ZIO[Scope, ZNothing, PageState] =
-    val executor: EndpointExecutor[Unit] =
-      EndpointExecutor(client, locator, ZIO.unit)
-
-    executor:
-      getPageState.apply(())
 }

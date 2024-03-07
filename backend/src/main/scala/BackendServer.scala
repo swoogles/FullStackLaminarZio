@@ -2,7 +2,7 @@ import fullstack.{Endpoints, PageState}
 import zio.*
 import zio.http.{Handler, Header, Middleware, Routes, Server}
 import zio.http.Middleware.CorsConfig
-import zio.http.codec.{HttpCodec, PathCodec}
+import zio.http.codec.PathCodec
 import zio.http.endpoint.openapi.{OpenAPIGen, SwaggerUI}
 
 object BackendServer extends ZIOAppDefault {
@@ -11,7 +11,11 @@ object BackendServer extends ZIOAppDefault {
     fullstack.Endpoints.post.implement:
       Handler.fromFunctionZIO:
         newState =>
-          backendState.set(newState).as("Updated state")
+          backendState
+            .set:
+              newState
+            .as:
+              "Updated state"
 
   def getRoute(backendState: Ref[PageState]) =
     fullstack.Endpoints
@@ -19,9 +23,14 @@ object BackendServer extends ZIOAppDefault {
         Handler.fromZIO:
           backendState.get
 
-  val openAPI = OpenAPIGen.fromEndpoints(title = "Endpoint Example", version = "1.0", Endpoints.getPageState, Endpoints.post)
+  val openAPI =
+    OpenAPIGen.fromEndpoints(
+      title = "Endpoint Example",
+      version = "1.0",
+      Endpoints.getPageState,
+      Endpoints.post
+    )
 
-  import HttpCodec.query
   import PathCodec._
   def run =
     for
