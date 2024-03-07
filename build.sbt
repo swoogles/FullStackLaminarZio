@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "3.3.1"
 ThisBuild / resolvers +=
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-lazy val `test-vite` = project.in(file("."))
+lazy val frontend = project.in(file("."))
   .enablePlugins(ScalaJSPlugin) // Enable the Scala.js plugin in this project
   .enablePlugins(ScalablyTypedConverterExternalNpmPlugin)
   .dependsOn(shared.js)
@@ -30,7 +30,6 @@ lazy val `test-vite` = project.in(file("."))
     // Depend on Laminar
     libraryDependencies ++= Seq(
       "com.raquo" %%% "laminar" % "15.0.1",
-      "com.softwaremill.sttp.client3" %%% "core" % "3.9.3",
       "dev.zio" %%% "zio" % "2.0.21",
       "dev.zio" %%% "zio-json" % "0.6.2",
       "dev.zio" %%% "zio-schema" % "1.0.1",
