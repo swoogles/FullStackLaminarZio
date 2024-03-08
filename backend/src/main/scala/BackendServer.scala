@@ -8,7 +8,7 @@ import zio.http.endpoint.openapi.{OpenAPIGen, SwaggerUI}
 object BackendServer extends ZIOAppDefault {
 
   def postRoute(backendState: Ref[PageState]) =
-    fullstack.Endpoints.post.implement:
+    Endpoints.post.implement:
       Handler.fromFunctionZIO:
         newState =>
           backendState
@@ -34,9 +34,21 @@ object BackendServer extends ZIOAppDefault {
   import PathCodec._
   def run =
     for
-      backendState <- Ref.make(PageState(Some("**Default state from Server**")))
+      backendState <-
+//        Ref.make(PageState(Some("**Default state from Server**")))
+        Ref.make:
+          PageState(
+            Some:
+              "**Default state from Server**"
+          )
       _ <- Server
-        .serve((Routes(postRoute(backendState), getRoute(backendState))++ SwaggerUI.routes("docs", openAPI)).toHttpApp @@
+        .serve(
+          (
+            Routes(
+              postRoute(backendState),
+              getRoute(backendState)
+            )++ SwaggerUI.routes("docs", openAPI)
+            ).toHttpApp @@
           Middleware.debug @@
           Middleware.requestLogging( _ => LogLevel.Error) @@
           Middleware.cors(CorsConfig( allowedOrigin = whatever => Some(Header.AccessControlAllowOrigin.All)))
