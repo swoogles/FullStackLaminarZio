@@ -35,7 +35,7 @@ object Main extends ZIOAppDefault{
     val saveButton = button(
       cls:="button is-primary",
       onClick --> clickObserver,
-      "Changed from different machine"
+      "Upload Priority to Server"
     )
 
     val billboard =
